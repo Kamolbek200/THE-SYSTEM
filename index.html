@@ -1,0 +1,2610 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-accent="blue">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE DISCIPLINE SYSTEM | OPERATOR CONSOLE v4.0</title>
+    <style>
+      /* =========================================
+       CSS VARIABLES & THEMING
+       ========================================= */
+      :root {
+        --font-main: "Inter", system-ui, -apple-system, sans-serif;
+        --font-display: "Cinzel", serif;
+        --radius: 10px;
+        --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        --shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+
+        --bg: #0b0b10;
+        --bg-sec: #14141c;
+        --card: #1c1c26;
+        --card-hover: #252530;
+        --border: #2a2a3a;
+        --text: #e6e6ed;
+        --text-muted: #8a8a9d;
+        --text-dim: #5a5a70;
+        --input-bg: rgba(255, 255, 255, 0.04);
+
+        --accent: #4a8eff;
+        --accent-hover: #5a9eff;
+        --accent-glow: rgba(74, 142, 255, 0.25);
+        --accent-soft: rgba(74, 142, 255, 0.1);
+
+        --success: #34d399;
+        --success-glow: rgba(52, 211, 153, 0.2);
+        --warning: #fbbf24;
+        --warning-glow: rgba(251, 191, 36, 0.2);
+        --danger: #f87171;
+        --danger-glow: rgba(248, 113, 113, 0.2);
+        --purple: #a78bfa;
+      }
+
+      [data-theme="light"] {
+        --bg: #f5f6f8;
+        --bg-sec: #ffffff;
+        --card: #ffffff;
+        --card-hover: #f9fafb;
+        --border: #e2e4ea;
+        --text: #1f232b;
+        --text-muted: #5a6275;
+        --text-dim: #8a909d;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --input-bg: rgba(0, 0, 0, 0.03);
+        --accent: #2563eb;
+        --accent-hover: #1d4ed8;
+        --accent-glow: rgba(37, 99, 235, 0.15);
+        --accent-soft: rgba(37, 99, 235, 0.08);
+      }
+      [data-accent="purple"] {
+        --accent: #a78bfa;
+        --accent-hover: #8b5cf6;
+        --accent-glow: rgba(167, 139, 250, 0.2);
+        --accent-soft: rgba(167, 139, 250, 0.1);
+      }
+      [data-accent="green"] {
+        --accent: #10b981;
+        --accent-hover: #059669;
+        --accent-glow: rgba(16, 185, 129, 0.2);
+        --accent-soft: rgba(16, 185, 129, 0.1);
+      }
+      [data-accent="orange"] {
+        --accent: #f97316;
+        --accent-hover: #ea580c;
+        --accent-glow: rgba(249, 115, 22, 0.2);
+        --accent-soft: rgba(249, 115, 22, 0.1);
+      }
+      [data-accent="red"] {
+        --accent: #ef4444;
+        --accent-hover: #dc2626;
+        --accent-glow: rgba(239, 68, 68, 0.2);
+        --accent-soft: rgba(239, 68, 68, 0.1);
+      }
+
+      /* =========================================
+       BASE & RESET
+       ========================================= */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-size: var(--base-size, 16px);
+      }
+      body {
+        font-family: var(--font-main);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        min-height: 100vh;
+        transition:
+          background 0.4s ease,
+          color 0.4s ease;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+
+      /* =========================================
+       LAYOUT & NAVIGATION
+       ========================================= */
+      .app-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(var(--bg-sec), 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .brand {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+      }
+      .brand span {
+        color: var(--accent);
+      }
+      .header-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .pill {
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: var(--transition);
+        user-select: none;
+      }
+      .pill:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .nav {
+        display: flex;
+        gap: 4px;
+        padding: 12px 24px;
+        background: var(--bg-sec);
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+        scrollbar-width: none;
+        position: sticky;
+        top: 61px;
+        z-index: 90;
+      }
+      .nav::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        font-family: var(--font-main);
+        white-space: nowrap;
+      }
+      .nav-btn:hover {
+        color: var(--text);
+        background: var(--card);
+      }
+      .nav-btn.active {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        font-weight: 600;
+      }
+
+      .main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+        width: 100%;
+        flex: 1;
+      }
+      .view {
+        display: none;
+        animation: fadeSlide 0.35s ease;
+      }
+      .view.active {
+        display: block;
+      }
+      @keyframes fadeSlide {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* =========================================
+       COMPONENTS
+       ========================================= */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        margin-bottom: 18px;
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+      .card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .card-title {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .tag {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .tag-blue {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+      }
+      .tag-green {
+        background: var(--success-glow);
+        color: var(--success);
+        border: 1px solid var(--success);
+      }
+      .tag-orange {
+        background: var(--warning-glow);
+        color: var(--warning);
+        border: 1px solid var(--warning);
+      }
+      .tag-red {
+        background: var(--danger-glow);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+      }
+      .tag-purple {
+        background: rgba(167, 139, 250, 0.15);
+        color: var(--purple);
+        border: 1px solid var(--purple);
+      }
+
+      .progress {
+        height: 6px;
+        background: var(--input-bg);
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 6px 0 10px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #6aaaff);
+        border-radius: 3px;
+        transition: width 0.6s ease;
+        position: relative;
+      }
+      .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4)
+        );
+        border-radius: 0 3px 3px 0;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+      }
+
+      .stat-box {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        transition: var(--transition);
+        cursor: pointer;
+      }
+      .stat-box:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        background: var(--card-hover);
+      }
+      .stat-val {
+        font-size: 20px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        color: var(--accent);
+      }
+      .stat-lbl {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-top: 4px;
+        letter-spacing: 0.5px;
+      }
+
+      .mission-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 10px;
+        position: relative;
+        transition: var(--transition);
+      }
+      .mission-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 3px;
+        height: 100%;
+        border-radius: var(--radius) 0 0 var(--radius);
+        background: var(--border);
+        transition: 0.3s;
+      }
+      .m-locked::before {
+        background: var(--text-dim);
+        opacity: 0.4;
+      }
+      .m-active::before {
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent-glow);
+      }
+      .m-progress::before {
+        background: var(--warning);
+        box-shadow: 0 0 8px var(--warning-glow);
+      }
+      .m-done::before {
+        background: var(--success);
+        box-shadow: 0 0 8px var(--success-glow);
+      }
+
+      .m-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .m-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .m-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.4;
+        margin-bottom: 10px;
+      }
+      .m-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .rewards {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .r-pill {
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+      .r-xp {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .r-g {
+        background: var(--warning-glow);
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .r-stat {
+        background: var(--success-glow);
+        color: var(--success);
+        border-color: var(--success);
+      }
+
+      .btn {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        font-family: var(--font-main);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        user-select: none;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 0 12px var(--accent-glow);
+        transform: translateY(-1px);
+      }
+      .btn-secondary {
+        background: var(--input-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        background: var(--card-hover);
+        border-color: var(--accent);
+      }
+      .btn-success {
+        background: var(--success);
+        color: #000;
+        font-weight: 700;
+      }
+      .btn-success:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #d64545;
+        transform: translateY(-1px);
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 13px;
+        margin-bottom: 12px;
+        font-family: var(--font-main);
+        transition: var(--transition);
+      }
+      .input-field:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+      textarea.input-field {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--text-muted);
+      }
+      .empty-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+        opacity: 0.4;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal.show {
+        display: flex;
+        animation: fadeIn 0.2s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .modal-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+        max-width: 480px;
+        width: 100%;
+        box-shadow: var(--shadow-lg);
+        animation: scaleIn 0.3s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      }
+      @keyframes scaleIn {
+        from {
+          transform: scale(0.95);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .modal-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 16px;
+        transition: var(--transition);
+      }
+      .modal-close:hover {
+        color: var(--danger);
+        transform: rotate(90deg);
+      }
+
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 210;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 360px;
+      }
+      .toast {
+        background: var(--card);
+        border: 1px solid var(--success);
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        box-shadow: var(--shadow-lg);
+        transform: translateX(120%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: auto;
+      }
+      .toast.show {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      .toast-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #000;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+
+      .confetti {
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        z-index: 220;
+        pointer-events: none;
+        border-radius: 2px;
+      }
+      @keyframes fall {
+        0% {
+          transform: translateY(-10vh) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      .reset-section {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        text-align: center;
+      }
+
+      /* Animations & Effects */
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 5px var(--accent-glow);
+        }
+        50% {
+          box-shadow:
+            0 0 15px var(--accent-glow),
+            0 0 30px rgba(74, 142, 255, 0.1);
+        }
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      .glow {
+        animation: glow 3s infinite;
+      }
+
+      /* Responsive */
+      @media (max-width: 700px) {
+        .header {
+          padding: 12px 16px;
+        }
+        .brand {
+          font-size: 18px;
+        }
+        .nav {
+          padding: 10px 12px;
+        }
+        .main {
+          padding: 16px;
+        }
+        .grid-4 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .modal-box {
+          padding: 16px;
+        }
+      }
+
+      /* Utility */
+      .flex-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .text-muted {
+        color: var(--text-muted);
+      }
+      .text-sm {
+        font-size: 12px;
+      }
+      .text-xs {
+        font-size: 10px;
+      }
+      .mt-2 {
+        margin-top: 8px;
+      }
+      .mt-4 {
+        margin-top: 16px;
+      }
+      .mb-2 {
+        margin-bottom: 8px;
+      }
+      .mb-4 {
+        margin-bottom: 16px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .scroll-y {
+        overflow-y: auto;
+      }
+      .scroll-y::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scroll-y::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-wrapper">
+      <header class="header">
+        <!-- header-right ichiga qo'shing -->
+        <div
+          class="pill"
+          id="authPill"
+          onclick="handleAuth()"
+          title="Login / Cloud"
+        >
+          🔐 <span id="authText">Login</span>
+        </div>
+
+        <script>
+          function handleAuth() {
+            if (auth.currentUser) {
+              if (confirm("Chiqishni xohlaysizmi?")) signOut();
+            } else {
+              signInGoogle();
+            }
+            updateAuthUI();
+          }
+
+          function updateAuthUI() {
+            const user = auth.currentUser;
+            document.getElementById("authText").textContent = user
+              ? user.displayName?.split(" ")[0] || "User"
+              : "Login";
+            document.getElementById("authPill").title = user
+              ? "Cloud: ON"
+              : "Login to sync";
+          }
+
+          // Auth holatini kuzatish
+          auth.onAuthStateChanged((user) => {
+            updateAuthUI();
+            if (user) console.log("👤 Logged in:", user.email);
+          });
+        </script>
+        <div class="brand">
+          THE <span>SYSTEM</span>
+          <span class="tag tag-blue" style="font-size: 9px; margin-left: 6px"
+            >v4.0</span
+          >
+        </div>
+        <div class="header-right">
+          <div class="pill" id="streakPill" title="Day Streak">
+            🔥 <span id="streakDisplay">0</span>
+          </div>
+          <div class="pill" id="meritPill" title="Merits (Currency)">
+            🪙 <span id="meritDisplay">0</span>
+          </div>
+          <div class="pill" onclick="toggleTheme()" title="Toggle Theme">
+            🌓
+          </div>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn" data-view="missions">Missions</button>
+        <button class="nav-btn" data-view="shop">Shop</button>
+        <button class="nav-btn" data-view="inventory">Inventory</button>
+        <button class="nav-btn" data-view="achievements">Achievements</button>
+        <button class="nav-btn" data-view="journal">Journal</button>
+        <button class="nav-btn" data-view="settings">Settings</button>
+      </nav>
+
+      <main class="main">
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="view active">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Operator Status</div>
+                <div class="tag tag-blue" id="rankDisplay">E-CLASS</div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 14px;
+                  align-items: center;
+                  margin-bottom: 14px;
+                "
+              >
+                <div
+                  style="
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 10px;
+                    background: linear-gradient(135deg, var(--accent), #6aaaff);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 900;
+                    font-size: 20px;
+                    color: #fff;
+                    font-family: var(--font-display);
+                  "
+                  id="initials"
+                >
+                  OP
+                </div>
+                <div>
+                  <div
+                    style="font-weight: 700; font-size: 16px"
+                    id="nameDisplay"
+                  >
+                    Operator
+                  </div>
+                  <div
+                    style="font-size: 12px; color: var(--text-muted)"
+                    id="dayDisplay"
+                  >
+                    Day 1
+                  </div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--purple);
+                      margin-top: 2px;
+                    "
+                    id="prestigeDisplay"
+                  >
+                    Prestige: 0
+                  </div>
+                </div>
+                <div style="margin-left: auto; text-align: right">
+                  <div
+                    style="
+                      font-size: 10px;
+                      color: var(--text-muted);
+                      text-transform: uppercase;
+                      letter-spacing: 0.5px;
+                    "
+                  >
+                    Level
+                  </div>
+                  <div
+                    style="
+                      font-size: 26px;
+                      font-weight: 900;
+                      color: var(--accent);
+                    "
+                    id="levelDisplay"
+                  >
+                    1
+                  </div>
+                </div>
+              </div>
+              <div class="flex-between text-xs text-muted mb-2">
+                <span>Experience</span><span id="xpText">0 / 100</span>
+              </div>
+              <div class="progress">
+                <div class="progress-fill" id="xpFill" style="width: 0%"></div>
+              </div>
+              <div class="flex-between mt-2">
+                <div
+                  style="font-size: 11px; color: var(--text-muted)"
+                  id="weatherWidget"
+                >
+                  Weather: Calculating...
+                </div>
+                <div class="tag tag-orange" id="cycleTimer">00:00:00</div>
+              </div>
+            </div>
+
+            <div
+              class="card"
+              style="
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+              "
+            >
+              <div class="card-title text-sm text-muted mb-2">Daily Wisdom</div>
+              <div
+                style="
+                  font-size: 13px;
+                  line-height: 1.6;
+                  font-style: italic;
+                  min-height: 40px;
+                "
+                id="quoteDisplay"
+              >
+                "Discipline is choosing between what you want now and what you
+                want most."
+              </div>
+              <button
+                class="btn btn-secondary text-xs mt-2"
+                onclick="refreshQuote()"
+              >
+                Refresh Quote
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Core Attributes</div>
+              <button
+                class="btn btn-secondary text-xs"
+                onclick="switchView('settings')"
+              >
+                Manage Stats
+              </button>
+            </div>
+            <div class="grid-4" id="dashStats"></div>
+            <div
+              class="mt-4 pt-4"
+              style="
+                border-top: 1px solid var(--border);
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                flex-wrap: wrap;
+                font-size: 12px;
+              "
+            >
+              <span
+                >⚔️ Power:
+                <b id="derivedPower" style="color: var(--danger)">0</b></span
+              >
+              <span
+                >🎯 Efficiency:
+                <b id="derivedEff" style="color: var(--success)">0%</b></span
+              >
+              <span
+                >🛡️ Endurance:
+                <b id="derivedEnd" style="color: var(--warning)">0</b></span
+              >
+              <span
+                >📖 Insight:
+                <b id="derivedWis" style="color: var(--accent)">0</b></span
+              >
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Activity Log</div>
+              <div class="tag tag-green" id="lastLogDate">No logs</div>
+            </div>
+            <div
+              id="activityLog"
+              class="scroll-y"
+              style="
+                max-height: 140px;
+                font-size: 12px;
+                color: var(--text-muted);
+                padding-right: 4px;
+              "
+            >
+              <div class="empty-state text-sm">
+                System initialized. Awaiting operator input.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MISSIONS -->
+        <div id="missions" class="view">
+          <div class="flex-between mb-4">
+            <div class="card-title">Daily Directives</div>
+            <div style="display: flex; gap: 8px">
+              <button
+                class="btn btn-primary text-xs"
+                onclick="showModal('createMissionModal')"
+              >
+                + Custom
+              </button>
+              <div class="tag tag-orange" id="missionDate">TODAY</div>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              background: var(--warning-glow);
+              border-color: var(--warning);
+              margin-bottom: 16px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 10px;
+            "
+          >
+            <div>
+              <div style="font-weight: 700; color: var(--warning)">
+                Bonus Challenge
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted)">
+                Complete an extra 15 min of deep work or intense focus.
+              </div>
+            </div>
+            <button
+              class="btn btn-primary text-xs"
+              id="bonusBtn"
+              onclick="claimBonus()"
+            >
+              Claim (+50XP +20M)
+            </button>
+          </div>
+          <div id="missionList"></div>
+        </div>
+
+        <!-- SHOP -->
+        <div id="shop" class="view">
+          <div class="flex-between mb-4">
+            <div class="card-title">Resource Hub</div>
+            <input
+              type="text"
+              id="shopSearch"
+              class="input-field mb-0"
+              placeholder="Search items..."
+              style="margin: 0; width: 200px; padding: 6px 8px; font-size: 12px"
+              oninput="renderShop()"
+            />
+          </div>
+          <div
+            class="card"
+            style="
+              background: var(--warning-glow);
+              border-color: var(--warning);
+              margin-bottom: 16px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 10px;
+            "
+          >
+            <div>
+              <div style="font-weight: 700; color: var(--warning)">
+                Flash Sale Active!
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted)">
+                Mystery Box is 50% off today. Limited stock.
+              </div>
+            </div>
+            <div class="tag tag-orange" id="saleTimer">ENDS IN 00:00:00</div>
+          </div>
+          <div class="grid-3" id="shopGrid"></div>
+        </div>
+
+        <!-- INVENTORY -->
+        <div id="inventory" class="view">
+          <div class="flex-between mb-4">
+            <div class="card-title">Inventory & Equipment</div>
+            <div style="display: flex; gap: 6px; align-items: center">
+              <button
+                class="btn btn-secondary text-xs"
+                onclick="filterInv('all')"
+              >
+                All
+              </button>
+              <button
+                class="btn btn-secondary text-xs"
+                onclick="filterInv('equip')"
+              >
+                Equip
+              </button>
+              <button
+                class="btn btn-secondary text-xs"
+                onclick="filterInv('use')"
+              >
+                Use
+              </button>
+              <div class="tag tag-green" id="invCount">0</div>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-title text-sm mb-2">Equipped Slots</div>
+            <div class="grid-3" id="equipSlots"></div>
+          </div>
+          <div class="grid-3" id="invGrid"></div>
+          <div class="empty-state" id="invEmpty" style="display: none">
+            <div class="empty-icon">--</div>
+            <div>Inventory is empty. Complete missions or visit the shop.</div>
+          </div>
+        </div>
+
+        <!-- ACHIEVEMENTS -->
+        <div id="achievements" class="view">
+          <div class="flex-between mb-4">
+            <div class="card-title">Milestones</div>
+            <div class="tag tag-purple" id="achCount">0/12</div>
+          </div>
+          <div class="grid-2" id="achieveGrid"></div>
+        </div>
+
+        <!-- JOURNAL -->
+        <div id="journal" class="view">
+          <div class="flex-between mb-4">
+            <div class="card-title">Operator Journal</div>
+            <button
+              class="btn btn-primary text-xs"
+              onclick="saveJournalEntry()"
+            >
+              Save Entry
+            </button>
+          </div>
+          <div class="card">
+            <textarea
+              id="journalInput"
+              class="input-field mb-0"
+              placeholder="Write your thoughts, plans, or reflections here..."
+              style="height: 150px"
+            ></textarea>
+            <div class="flex-between mt-4 mb-2">
+              <div class="text-xs text-muted">
+                Tip: Writing daily improves clarity and focus.
+              </div>
+              <input
+                type="text"
+                id="journalSearch"
+                class="input-field mb-0"
+                placeholder="Search entries..."
+                style="margin: 0; width: 180px; font-size: 12px"
+                oninput="renderJournal()"
+              />
+            </div>
+          </div>
+          <div
+            id="journalHistory"
+            class="scroll-y"
+            style="max-height: 400px; margin-top: 12px"
+          ></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="settings" class="view">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">System Configuration</div>
+            </div>
+            <div class="mb-4">
+              <div class="text-xs text-muted mb-2">Operator Identifier</div>
+              <input
+                type="text"
+                id="nameInput"
+                class="input-field"
+                placeholder="Enter your name"
+                maxlength="24"
+              /><button class="btn btn-primary text-xs" onclick="saveProfile()">
+                Update
+              </button>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 16px;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 13px;
+                  cursor: pointer;
+                "
+                ><input type="checkbox" id="setSound" /> Enable Sound
+                Effects</label
+              >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 13px;
+                  cursor: pointer;
+                "
+                ><input type="checkbox" id="setAnim" /> Enable Interface
+                Animations</label
+              >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 13px;
+                  cursor: pointer;
+                "
+                ><input type="checkbox" id="setStrict" /> Strict Verification
+                Mode</label
+              >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 13px;
+                  flex-wrap: wrap;
+                "
+              >
+                Accent Color:
+                <select
+                  id="setAccent"
+                  class="input-field mb-0"
+                  style="width: auto; padding: 4px 8px"
+                >
+                  <option value="blue">Blue</option>
+                  <option value="purple">Purple</option>
+                  <option value="green">Green</option>
+                  <option value="orange">Orange</option>
+                  <option value="red">Red</option>
+                </select>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 13px;
+                "
+              >
+                Font Size:
+                <input
+                  type="range"
+                  id="setFontSize"
+                  min="12"
+                  max="20"
+                  value="16"
+                  style="width: 150px"
+                />
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
+              <button class="btn btn-secondary text-xs" onclick="exportData()">
+                Export JSON
+              </button>
+              <input
+                type="file"
+                id="importFile"
+                class="hidden"
+                accept=".json"
+                onchange="importData(this)"
+              />
+              <button
+                class="btn btn-secondary text-xs"
+                onclick="document.getElementById('importFile').click()"
+              >
+                Import JSON
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Prestige Protocol</div>
+            </div>
+            <div class="text-sm text-muted mb-2">
+              Reset progress at Level 50 to gain a permanent +10% XP multiplier.
+              Current multiplier:
+              <span
+                style="color: var(--purple); font-weight: 700"
+                id="prestigeMult"
+                >1.0x</span
+              >
+            </div>
+            <button
+              class="btn btn-primary text-xs"
+              id="prestigeBtn"
+              onclick="doPrestige()"
+            >
+              Execute Prestige (Requires Lvl 50)
+            </button>
+          </div>
+          <div class="card" style="border-color: var(--danger)">
+            <div class="card-header">
+              <div class="card-title">Data Management</div>
+            </div>
+            <button class="btn btn-danger text-xs" onclick="confirmReset()">
+              Wipe All Data & Reset
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- MODALS -->
+      <div class="modal" id="verifyModal">
+        <div class="modal-box">
+          <button class="modal-close" onclick="closeModal('verifyModal')">
+            ×
+          </button>
+          <div class="card-title mb-2">Verification Protocol</div>
+          <div class="text-sm text-muted mb-4">
+            Honesty drives growth. Confirm execution with a brief reflection.
+          </div>
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 13px;
+              margin-bottom: 12px;
+              cursor: pointer;
+            "
+            ><input type="checkbox" id="vCheck" /> I executed this directive
+            with full integrity</label
+          >
+          <input
+            type="text"
+            id="vText"
+            class="input-field"
+            placeholder="Reflection (min 6 chars)"
+          />
+          <div
+            class="text-xs mb-2"
+            id="vError"
+            style="color: var(--danger); min-height: 16px"
+          ></div>
+          <div class="flex-between mt-2">
+            <button
+              class="btn btn-secondary"
+              onclick="closeModal('verifyModal')"
+            >
+              Cancel</button
+            ><button class="btn btn-success" id="vSubmit">
+              Confirm Completion
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="createMissionModal">
+        <div class="modal-box">
+          <button
+            class="modal-close"
+            onclick="closeModal('createMissionModal')"
+          >
+            ×
+          </button>
+          <div class="card-title mb-2">Custom Directive</div>
+          <input
+            type="text"
+            id="cmTitle"
+            class="input-field"
+            placeholder="Mission Title"
+          />
+          <textarea
+            id="cmDesc"
+            class="input-field"
+            placeholder="Description & Requirements"
+            style="height: 80px"
+          ></textarea>
+          <select id="cmDiff" class="input-field">
+            <option value="1">Easy (1★)</option>
+            <option value="2">Normal (2★)</option>
+            <option value="3">Hard (3★)</option>
+          </select>
+          <div class="flex-between">
+            <button
+              class="btn btn-secondary"
+              onclick="closeModal('createMissionModal')"
+            >
+              Cancel</button
+            ><button class="btn btn-primary" onclick="addCustomMission()">
+              Add to Queue
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="itemModal">
+        <div class="modal-box" id="itemModalContent"></div>
+      </div>
+
+      <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script>
+      /* =========================================
+       CORE STATE & PERSISTENCE
+       ========================================= */
+      const DEF = {
+        v: 4,
+        name: "Operator",
+        level: 1,
+        xp: 0,
+        xpN: 100,
+        merits: 0,
+        streak: 0,
+        day: 1,
+        last: null,
+        stats: { STR: 5, AGI: 5, INT: 5, VIT: 5 },
+        pts: 0,
+        missions: [],
+        doneIds: [],
+        inventory: [],
+        achievements: [],
+        history: [],
+        journal: [],
+        custom: [],
+        bonus: false,
+        equipped: { head: null, body: null, acc: null },
+        prestige: 0,
+        set: {
+          theme: "dark",
+          accent: "blue",
+          sound: false,
+          anim: true,
+          strict: true,
+          size: 16,
+        },
+        totalM: 0,
+      };
+      let S = {};
+
+      function load() {
+        try {
+          const d = localStorage.getItem("sys_v4");
+          if (d) {
+            S = JSON.parse(d);
+            for (let k in DEF) if (!(k in S)) S[k] = DEF[k];
+          } else S = JSON.parse(JSON.stringify(DEF));
+        } catch (e) {
+          S = JSON.parse(JSON.stringify(DEF));
+        }
+        applySet();
+        checkDay();
+        genMissions();
+        save();
+      }
+      function save() {
+        localStorage.setItem("sys_v4", JSON.stringify(S));
+      }
+      function applySet() {
+        document.body.setAttribute("data-theme", S.set.theme);
+        document.body.setAttribute("data-accent", S.set.accent);
+        document.documentElement.style.setProperty(
+          "--base-size",
+          S.set.size + "px",
+        );
+        document.documentElement.style.setProperty(
+          "--transition",
+          S.set.anim ? "0.25s cubic-bezier(0.4,0,0.2,1)" : "0s",
+        );
+      }
+      function checkDay() {
+        const t = new Date().toDateString();
+        if (S.last !== t) {
+          const d = S.last
+            ? Math.floor((new Date(t) - new Date(S.last)) / 864e5)
+            : 99;
+          if (d > 1 && !S.inventory.find((i) => i.id === "i4")) S.streak = 0;
+          S.last = t;
+          S.day++;
+          S.missions = [];
+          S.doneIds = [];
+          S.bonus = false;
+          if (S.streak >= 3) {
+            S.merits += 10;
+            showToast(`+10 Merits (Streak Bonus)`);
+            addHist("Streak bonus awarded");
+          }
+          save();
+        }
+      }
+
+      /* =========================================
+       DATA POOLS & CONSTANTS
+       ========================================= */
+      const POOL = {
+        1: [
+          {
+            id: "m1",
+            title: "Morning Movement",
+            desc: "20 min physical activity. Walk, stretch, or jog.",
+            s: { STR: 1, VIT: 1 },
+            xp: 15,
+            g: 8,
+            dif: 1,
+          },
+          {
+            id: "m2",
+            title: "Focus Block",
+            desc: "45 min deep work. Phone in another room.",
+            s: { AGI: 2 },
+            xp: 18,
+            g: 10,
+            dif: 2,
+          },
+          {
+            id: "m3",
+            title: "Knowledge Input",
+            desc: "Read or study for 30 min. Take notes.",
+            s: { INT: 2 },
+            xp: 15,
+            g: 8,
+            dif: 1,
+          },
+          {
+            id: "m4",
+            title: "Evening Reflection",
+            desc: "Write 3 lines about today. Plan tomorrow.",
+            s: { INT: 1, VIT: 1 },
+            xp: 12,
+            g: 6,
+            dif: 1,
+          },
+        ],
+        30: [
+          {
+            id: "m5",
+            title: "Intense Training",
+            desc: "45 min high-intensity exercise. Push limits.",
+            s: { STR: 2 },
+            xp: 22,
+            g: 12,
+            dif: 2,
+          },
+          {
+            id: "m6",
+            title: "Flow State",
+            desc: "2 hours uninterrupted creation or study.",
+            s: { AGI: 2, INT: 1 },
+            xp: 28,
+            g: 15,
+            dif: 3,
+          },
+          {
+            id: "m7",
+            title: "Skill Application",
+            desc: "Deliberate practice on weakest area.",
+            s: { STR: 1, INT: 1, VIT: 1 },
+            xp: 20,
+            g: 10,
+            dif: 2,
+          },
+          {
+            id: "m8",
+            title: "System Audit",
+            desc: "Review routine. Remove 1 inefficiency.",
+            s: { INT: 2 },
+            xp: 18,
+            g: 8,
+            dif: 2,
+          },
+        ],
+      };
+      const ITEMS = [
+        {
+          id: "i1",
+          name: "Focus Lens",
+          desc: "+10% Focus efficiency",
+          type: "equip",
+          slot: "head",
+          price: 40,
+          eff: { AGI: 0.1 },
+        },
+        {
+          id: "i2",
+          name: "Iron Vest",
+          desc: "+15% Endurance",
+          type: "equip",
+          slot: "body",
+          price: 70,
+          eff: { VIT: 0.15 },
+        },
+        {
+          id: "i3",
+          name: "Wisdom Ring",
+          desc: "+5 Intelligence",
+          type: "equip",
+          slot: "acc",
+          price: 50,
+          eff: { INT: 5 },
+        },
+        {
+          id: "i4",
+          name: "Shield Core",
+          desc: "Protects 1 lost day",
+          type: "use",
+          price: 90,
+        },
+        {
+          id: "i5",
+          name: "XP Vial",
+          desc: "+50 XP instantly",
+          type: "use",
+          price: 35,
+          eff: { xp: 50 },
+        },
+        {
+          id: "i6",
+          name: "Mystery Box",
+          desc: "Random item or stat boost",
+          type: "use",
+          price: 45,
+        },
+        {
+          id: "i7",
+          name: "Reset Scroll",
+          desc: "Free stat reset",
+          type: "use",
+          price: 80,
+        },
+      ];
+      const ACHS = [
+        {
+          id: "a1",
+          n: "First Step",
+          d: "Complete 1 mission",
+          r: "common",
+          c: (s) => s.totalM >= 1,
+        },
+        {
+          id: "a2",
+          n: "Consistent",
+          d: "7-day streak",
+          r: "uncommon",
+          c: (s) => s.streak >= 7,
+        },
+        {
+          id: "a3",
+          n: "Veteran",
+          d: "50 missions",
+          r: "rare",
+          c: (s) => s.totalM >= 50,
+        },
+        {
+          id: "a4",
+          n: "Elite",
+          d: "Level 25",
+          r: "rare",
+          c: (s) => s.level >= 25,
+        },
+        {
+          id: "a5",
+          n: "Prestige I",
+          d: "First prestige",
+          r: "legendary",
+          c: (s) => s.prestige >= 1,
+        },
+        {
+          id: "a6",
+          n: "Collector",
+          d: "10 items owned",
+          r: "uncommon",
+          c: (s) => s.inventory.length >= 10,
+        },
+        {
+          id: "a7",
+          n: "Tycoon",
+          d: "500 Merits",
+          r: "rare",
+          c: (s) => s.merits >= 500,
+        },
+        {
+          id: "a8",
+          n: "Balanced",
+          d: "All stats >15",
+          r: "legendary",
+          c: (s) => Object.values(s.stats).every((v) => v >= 15),
+        },
+        {
+          id: "a9",
+          n: "Archivist",
+          d: "10 journal entries",
+          r: "common",
+          c: (s) => s.journal.length >= 10,
+        },
+        {
+          id: "a10",
+          n: "Hidden Path",
+          d: "Use 3 custom missions",
+          r: "legendary",
+          c: (s) => s.custom.length >= 3,
+        },
+        {
+          id: "a11",
+          n: "Iron Will",
+          d: "Reach Day 100",
+          r: "rare",
+          c: (s) => s.day >= 100,
+        },
+        {
+          id: "a12",
+          n: "Grandmaster",
+          d: "Reach Level 50",
+          r: "legendary",
+          c: (s) => s.level >= 50,
+        },
+      ];
+      const QUOTES = [
+        "Discipline is choosing between what you want now and what you want most.",
+        "Success is the sum of small efforts, repeated daily.",
+        "We must suffer discipline or regret.",
+        "Your future is built today, not tomorrow.",
+        "Focus is the master key to all success.",
+        "Mastery is born from consistency, not intensity.",
+      ];
+      const RARITY_COLORS = {
+        common: "var(--text-muted)",
+        uncommon: "var(--success)",
+        rare: "var(--accent)",
+        legendary: "var(--warning)",
+      };
+
+      /* =========================================
+       CORE SYSTEMS
+       ========================================= */
+      function getPhase(d) {
+        return d >= 30 ? 30 : 1;
+      }
+      function getRank(l) {
+        return l >= 75
+          ? "S"
+          : l >= 50
+            ? "A"
+            : l >= 30
+              ? "B"
+              : l >= 15
+                ? "C"
+                : l >= 5
+                  ? "D"
+                  : "E";
+      }
+
+      function genMissions() {
+        if (!S.missions.length) {
+          const p = POOL[getPhase(S.day)];
+          S.missions = p.map((t, i) => ({
+            ...t,
+            idx: i,
+            status: i === 0 ? "available" : "locked",
+          }));
+        }
+        S.custom.forEach((m) => {
+          if (!S.missions.find((x) => x.id === m.id))
+            S.missions.push({ ...m, idx: S.missions.length, status: "locked" });
+        });
+        const baseDone = S.missions
+          .filter((m) => !m.custom)
+          .every((m) => m.status === "done");
+        if (baseDone && S.missions.find((m) => m.custom))
+          S.missions.find((m) => m.custom).status = "available";
+        save();
+      }
+
+      function addXp(n) {
+        S.xp += n * (1 + S.prestige * 0.1);
+        let lvl = false;
+        while (S.xp >= S.xpN) {
+          S.xp -= S.xpN;
+          S.level++;
+          S.pts += 3;
+          S.xpN = Math.floor(100 * Math.pow(1.28, S.level - 1));
+          lvl = true;
+        }
+        if (lvl) {
+          showModal("levelModal");
+          confetti();
+          addHist(`Advanced to Level ${S.level}`);
+          playSound("levelup");
+        }
+        checkAch();
+      }
+
+      function alloc(stat) {
+        if (S.pts <= 0) return;
+        S.pts--;
+        S.stats[stat]++;
+        save();
+        render();
+        showToast(`+1 ${stat} allocated`);
+        playSound("click");
+      }
+
+      let verifyIdx = -1;
+      function startVerify(i) {
+        if (S.missions[i].status !== "available") return;
+        verifyIdx = i;
+        document.getElementById("vCheck").checked = false;
+        document.getElementById("vText").value = "";
+        document.getElementById("vError").textContent = "";
+        showModal("verifyModal");
+        document.getElementById("vSubmit").onclick = submitVerify;
+      }
+      function submitVerify() {
+        if (!document.getElementById("vCheck").checked) {
+          document.getElementById("vError").textContent =
+            "Confirm integrity first";
+          return;
+        }
+        const min = S.set.strict ? 10 : 6;
+        if (document.getElementById("vText").value.trim().length < min) {
+          document.getElementById("vError").textContent =
+            `Min ${min} characters required`;
+          return;
+        }
+        closeModal("verifyModal");
+        execMission(verifyIdx);
+      }
+
+      function execMission(i) {
+        const m = S.missions[i];
+        m.status = "done";
+        if (i + 1 < S.missions.length) S.missions[i + 1].status = "available";
+        addXp(m.xp);
+        S.merits += m.g;
+        S.totalM++;
+        for (let k in m.s) S.stats[k] += m.s[k];
+        S.doneIds.push(m.id);
+        if (S.doneIds.length === S.missions.filter((x) => !x.custom).length) {
+          checkAch();
+          addHist(`Daily Cycle Complete (Day ${S.day})`);
+        }
+        save();
+        render();
+        showToast(`Mission Complete | +${m.xp}XP +${m.g}M`);
+        playSound("complete");
+      }
+
+      function claimBonus() {
+        if (S.bonus) return;
+        S.bonus = true;
+        addXp(50);
+        S.merits += 20;
+        save();
+        render();
+        showToast("Bonus Challenge Claimed!");
+        playSound("complete");
+      }
+
+      function addCustom() {
+        const t = document.getElementById("cmTitle").value.trim();
+        const d = document.getElementById("cmDesc").value.trim();
+        const diff = +document.getElementById("cmDiff").value;
+        if (!t || !d) {
+          showToast("Title & Description required");
+          return;
+        }
+        const id = "c_" + Date.now();
+        S.custom.push({
+          id,
+          title: t,
+          desc: d,
+          dif: diff,
+          xp: diff * 10,
+          g: diff * 5,
+          s: { STR: 1, AGI: 1, INT: 1, VIT: 1 },
+          status: "locked",
+        });
+        closeModal("createMissionModal");
+        genMissions();
+        render();
+        showToast("Custom Directive Added");
+      }
+
+      function buy(id) {
+        const it = ITEMS.find((x) => x.id === id);
+        if (!it || S.merits < it.price) {
+          showToast("Insufficient Merits");
+          return;
+        }
+        let p = it.price;
+        if (id === "i6") p = Math.floor(p / 2);
+        S.merits -= p;
+        S.inventory.push({ ...it, uid: Date.now(), dur: 100 });
+        if (it.eff && it.eff.xp) addXp(it.eff.xp);
+        save();
+        render();
+        showToast(`Acquired: ${it.name}`);
+        playSound("buy");
+      }
+
+      function useItem(uid) {
+        const i = S.inventory.findIndex((x) => x.uid === uid);
+        if (i === -1) return;
+        const it = S.inventory[i];
+        if (it.id === "i5") addXp(50);
+        if (it.id === "i6") {
+          const r = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+          S.inventory.push({ ...r, uid: Date.now(), dur: 100 });
+          showToast(`Mystery Box Opened: ${r.name}`);
+        }
+        if (it.id === "i4")
+          showToast("Shield Core Activated. Next missed day preserved.");
+        if (it.id === "i7") {
+          S.pts +=
+            S.stats.STR -
+            5 +
+            (S.stats.AGI - 5) +
+            (S.stats.INT - 5) +
+            (S.stats.VIT - 5);
+          S.stats = { STR: 5, AGI: 5, INT: 5, VIT: 5 };
+          showToast("Stats Reset Executed");
+        }
+        S.inventory.splice(i, 1);
+        save();
+        render();
+        playSound("use");
+      }
+
+      function equip(uid) {
+        const i = S.inventory.findIndex((x) => x.uid === uid);
+        if (i === -1 || !S.inventory[i].slot) return;
+        const it = S.inventory[i];
+        if (S.equipped[it.slot]) S.inventory.push(S.equipped[it.slot]);
+        S.equipped[it.slot] = it;
+        S.inventory.splice(i, 1);
+        save();
+        render();
+        showToast(`Equipped: ${it.name}`);
+        playSound("equip");
+      }
+      function unequip(s) {
+        if (!S.equipped[s]) return;
+        S.inventory.push(S.equipped[s]);
+        S.equipped[s] = null;
+        save();
+        render();
+      }
+
+      function doPrestige() {
+        if (S.level < 50) return;
+        if (!confirm("Reset progress for permanent XP multiplier?")) return;
+        S.prestige++;
+        S.level = 1;
+        S.xp = 0;
+        S.xpN = 100;
+        S.pts = 0;
+        S.stats = { STR: 5, AGI: 5, INT: 5, VIT: 5 };
+        S.streak = 0;
+        S.doneIds = [];
+        S.missions = [];
+        S.custom = [];
+        S.equipped = { head: null, body: null, acc: null };
+        save();
+        render();
+        confetti();
+        showToast(`PRESTIGE ${S.prestige} ACHIEVED`);
+        addHist(`Prestige ${S.prestige} executed`);
+      }
+
+      function checkAch() {
+        ACHS.forEach((a) => {
+          if (!S.achievements.includes(a.id) && a.c(S)) {
+            S.achievements.push(a.id);
+            showToast(`Milestone Unlocked: ${a.n}`);
+            addHist(`Achievement: ${a.n}`);
+            confetti();
+          }
+        });
+      }
+      function addHist(m) {
+        S.history.unshift({ date: new Date().toLocaleString(), msg: m });
+        if (S.history.length > 40) S.history.pop();
+      }
+      function saveJournalEntry() {
+        const t = document.getElementById("journalInput").value.trim();
+        if (!t) {
+          showToast("Write something first");
+          return;
+        }
+        S.journal.unshift({
+          date: new Date().toLocaleDateString(),
+          text: t,
+          id: Date.now(),
+        });
+        if (S.journal.length > 100) S.journal.pop();
+        addXp(10);
+        S.merits += 5;
+        document.getElementById("journalInput").value = "";
+        save();
+        render();
+        showToast("Entry Saved (+10XP +5M)");
+      }
+
+      /* =========================================
+       UI RENDERING
+       ========================================= */
+      function render() {
+        document.getElementById("streakDisplay").textContent = S.streak;
+        document.getElementById("meritDisplay").textContent = S.merits;
+        document.getElementById("rankDisplay").textContent =
+          getRank(S.level) + "-CLASS";
+        document.getElementById("initials").textContent = S.name
+          .substring(0, 2)
+          .toUpperCase();
+        document.getElementById("nameDisplay").textContent = S.name;
+        document.getElementById("dayDisplay").textContent = `Day ${S.day}`;
+        document.getElementById("levelDisplay").textContent = S.level;
+        document.getElementById("xpText").textContent =
+          `${Math.floor(S.xp)} / ${S.xpN}`;
+        document.getElementById("xpFill").style.width =
+          `${Math.min(100, (S.xp / S.xpN) * 100)}%`;
+        document.getElementById("prestigeDisplay").textContent =
+          `Prestige: ${S.prestige}`;
+        document.getElementById("prestigeMult").textContent =
+          `${(1 + S.prestige * 0.1).toFixed(1)}x`;
+        document.getElementById("prestigeBtn").disabled = S.level < 50;
+        document.getElementById("prestigeBtn").textContent =
+          S.level >= 50 ? "Execute Prestige" : "Requires Level 50";
+        document.getElementById("missionDate").textContent =
+          new Date().toLocaleDateString();
+        document.getElementById("invCount").textContent = S.inventory.length;
+        document.getElementById("achCount").textContent =
+          `${S.achievements.length}/${ACHS.length}`;
+
+        renderDash();
+        renderMissions();
+        renderShop();
+        renderInventory();
+        renderAch();
+        renderJournal();
+        renderSettings();
+      }
+
+      function renderDash() {
+        document.getElementById("dashStats").innerHTML = [
+          "STR",
+          "AGI",
+          "INT",
+          "VIT",
+        ]
+          .map(
+            (s) =>
+              `<div class="stat-box" onclick="alloc('${s}')" title="Click to allocate point"><div class="stat-val">${S.stats[s]}</div><div class="stat-lbl">${s}</div></div>`,
+          )
+          .join("");
+        const b = S.stats.STR + S.stats.AGI + S.stats.INT + S.stats.VIT;
+        document.getElementById("derivedPower").textContent = b;
+        document.getElementById("derivedEff").textContent =
+          Math.min(100, Math.floor(b / 2)) + "%";
+        document.getElementById("derivedEnd").textContent = Math.floor(
+          S.stats.VIT * 1.5,
+        );
+        document.getElementById("derivedWis").textContent = S.stats.INT * 2;
+        document.getElementById("weatherWidget").textContent =
+          `Weather: ${15 + Math.floor(Math.sin(S.day) * 10)}°C | Clear`;
+        document.getElementById("activityLog").innerHTML = S.history.length
+          ? S.history
+              .map(
+                (h) =>
+                  `<div style="padding:4px 0; border-bottom:1px solid var(--border);"><span>${h.msg}</span> <span style="color:var(--text-dim); float:right; font-size:10px;">${h.date.split(",")[0]}</span></div>`,
+              )
+              .join("")
+          : '<div class="empty-state text-sm" style="padding:10px;">Awaiting input.</div>';
+        document.getElementById("lastLogDate").textContent = S.history[0]
+          ? S.history[0].date.split(",")[0]
+          : "No logs";
+      }
+
+      function renderMissions() {
+        const c = document.getElementById("missionList");
+        c.innerHTML = "";
+        S.missions.forEach((m, i) => {
+          const stars = "★".repeat(m.dif) + "☆".repeat(3 - m.dif);
+          const sH = Object.entries(m.s)
+            .map(([k, v]) => `<span class="r-pill r-stat">+${v} ${k}</span>`)
+            .join("");
+          let btn = "";
+          if (m.status === "done")
+            btn = `<span style="color:var(--success); font-weight:700;">Executed</span>`;
+          else if (m.status === "available")
+            btn = `<button class="btn btn-success text-xs" onclick="startVerify(${i})">Start</button>`;
+          else
+            btn = `<button class="btn btn-secondary text-xs" disabled>Locked</button>`;
+          c.innerHTML += `<div class="mission-card m-${m.status}"><div class="m-top"><span class="tag ${m.dif === 3 ? "tag-red" : m.dif === 2 ? "tag-orange" : "tag-blue"}">${stars}</span></div><div class="m-title">${m.title}</div><div class="m-desc">${m.desc}</div><div class="m-footer"><div class="rewards"><span class="r-pill r-xp">+${m.xp} XP</span><span class="r-pill r-g">+${m.g} M</span>${sH}</div>${btn}</div></div>`;
+        });
+        const bb = document.getElementById("bonusBtn");
+        bb.disabled = S.bonus;
+        bb.textContent = S.bonus ? "Claimed ✓" : "Claim (+50XP +20M)";
+      }
+
+      function renderShop() {
+        const q = document.getElementById("shopSearch").value.toLowerCase();
+        const c = document.getElementById("shopGrid");
+        c.innerHTML = "";
+        ITEMS.filter((i) => i.name.toLowerCase().includes(q)).forEach((r) => {
+          const can = S.merits >= r.price;
+          c.innerHTML += `<div class="card" style="${!can ? "opacity:0.6;pointer-events:none" : ""};cursor:pointer;" onclick="${can ? `buy('${r.id}')` : ""}"><div class="card-header"><div class="card-title" style="font-size:13px;">${r.name}</div><div class="tag ${r.type === "equip" ? "tag-purple" : "tag-orange"}">${r.type}</div></div><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">${r.desc}</div><div class="flex-between"><span style="color:var(--warning); font-weight:700;">🪙 ${r.price}</span><button class="btn btn-secondary text-xs" ${!can ? "disabled" : ""}>${can ? "Acquire" : "Locked"}</button></div></div>`;
+        });
+        const now = new Date();
+        document.getElementById("saleTimer").textContent =
+          `ENDS IN ${String(23 - now.getHours()).padStart(2, "0")}:00:00`;
+      }
+
+      let invFilter = "all";
+      function filterInv(f) {
+        invFilter = f;
+        renderInventory();
+      }
+      function renderInventory() {
+        const g = document.getElementById("invGrid");
+        const e = document.getElementById("invEmpty");
+        let list =
+          invFilter === "all"
+            ? S.inventory
+            : invFilter === "equip"
+              ? S.inventory.filter((i) => i.type === "equip")
+              : S.inventory.filter((i) => i.type === "use");
+        if (list.length === 0) {
+          g.style.display = "none";
+          e.style.display = "block";
+          return;
+        }
+        g.style.display = "grid";
+        e.style.display = "none";
+        g.innerHTML = "";
+        list.forEach((it) => {
+          let btn = "";
+          if (it.type === "equip")
+            btn = `<button class="btn btn-primary text-xs" onclick="equip(${it.uid})">Equip</button>`;
+          else
+            btn = `<button class="btn btn-primary text-xs" onclick="useItem(${it.uid})">Use</button>`;
+          g.innerHTML += `<div class="card" style="margin:0; padding:12px;"><div class="flex-between mb-2"><div style="font-weight:600;">${it.name}</div><div class="tag ${it.type === "equip" ? "tag-purple" : "tag-green"}">${it.type}</div></div><div class="text-xs text-muted">${it.desc}</div><div class="mt-2">${btn}</div></div>`;
+        });
+        const es = document.getElementById("equipSlots");
+        es.innerHTML = "";
+        ["head", "body", "acc"].forEach((s) => {
+          const it = S.equipped[s];
+          if (it)
+            es.innerHTML += `<div class="card" style="margin:0; padding:10px; border-color:var(--accent);"><div class="text-xs text-muted mb-1">${s.toUpperCase()}</div><div style="font-weight:600;">${it.name}</div><button class="btn btn-secondary text-xs mt-2" onclick="unequip('${s}')">Unequip</button></div>`;
+          else
+            es.innerHTML += `<div class="card" style="margin:0; padding:10px; opacity:0.5;"><div class="text-xs text-muted mb-1">${s.toUpperCase()}</div><div class="text-sm">Empty Slot</div></div>`;
+        });
+      }
+
+      function renderAch() {
+        const c = document.getElementById("achieveGrid");
+        c.innerHTML = "";
+        ACHS.forEach((a) => {
+          const u = S.achievements.includes(a.id);
+          c.innerHTML += `<div class="card" style="${u ? "border-color:var(--accent);background:var(--accent-soft)" : ""};opacity:${u ? 1 : 0.5};"><div class="flex-between"><div style="font-weight:600;">${a.n}</div><div class="tag" style="color:${RARITY_COLORS[a.r]}; border-color:${RARITY_COLORS[a.r]}; background:transparent;">${a.r}</div></div><div class="text-xs text-muted mt-2">${a.d}</div></div>`;
+        });
+      }
+
+      function renderJournal() {
+        const q = document.getElementById("journalSearch").value.toLowerCase();
+        const c = document.getElementById("journalHistory");
+        const filtered = S.journal.filter(
+          (j) =>
+            j.text.toLowerCase().includes(q) ||
+            j.date.toLowerCase().includes(q),
+        );
+        c.innerHTML = filtered.length
+          ? filtered
+              .map(
+                (j) =>
+                  `<div class="card mb-2"><div class="flex-between"><div class="text-xs text-muted">${j.date}</div></div><div class="text-sm mt-2" style="white-space:pre-wrap;">${j.text}</div></div>`,
+              )
+              .join("")
+          : '<div class="empty-state text-sm">No entries found.</div>';
+      }
+
+      function renderSettings() {
+        document.getElementById("nameInput").value = S.name;
+        document.getElementById("setSound").checked = S.set.sound;
+        document.getElementById("setAnim").checked = S.set.anim;
+        document.getElementById("setStrict").checked = S.set.strict;
+        document.getElementById("setAccent").value = S.set.accent;
+        document.getElementById("setFontSize").value = S.set.size;
+        document.getElementById("setSound").onchange = (e) => {
+          S.set.sound = e.target.checked;
+          save();
+        };
+        document.getElementById("setAnim").onchange = (e) => {
+          S.set.anim = e.target.checked;
+          applySet();
+          save();
+        };
+        document.getElementById("setStrict").onchange = (e) => {
+          S.set.strict = e.target.checked;
+          save();
+        };
+        document.getElementById("setAccent").onchange = (e) => {
+          S.set.accent = e.target.value;
+          applySet();
+          save();
+        };
+        document.getElementById("setFontSize").oninput = (e) => {
+          S.set.size = +e.target.value;
+          applySet();
+          save();
+        };
+      }
+
+      function saveProfile() {
+        const v = document.getElementById("nameInput").value.trim();
+        if (v.length >= 2) {
+          S.name = v;
+          save();
+          render();
+          showToast("Identifier Updated");
+        } else showToast("Name too short");
+      }
+      function confirmReset() {
+        if (confirm("Wipe all progress permanently?")) {
+          localStorage.removeItem("sys_v4");
+          location.reload();
+        }
+      }
+      function exportData() {
+        const b = new Blob([JSON.stringify(S, null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = `sys_backup_${new Date().toISOString().split("T")[0]}.json`;
+        a.click();
+        showToast("Data Exported");
+      }
+      function importData(i) {
+        if (!i.files[0]) return;
+        const r = new FileReader();
+        r.onload = (e) => {
+          try {
+            S = JSON.parse(e.target.result);
+            save();
+            render();
+            showToast("Data Imported Successfully");
+          } catch {
+            showToast("Invalid File Format");
+          }
+        };
+        r.readAsText(i.files[0]);
+      }
+      function refreshQuote() {
+        document.getElementById("quoteDisplay").textContent =
+          QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      }
+      function toggleTheme() {
+        S.set.theme = S.set.theme === "dark" ? "light" : "dark";
+        applySet();
+        save();
+      }
+
+      /* =========================================
+       UI UTILS & EFFECTS
+       ========================================= */
+      function switchView(id) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document
+          .querySelector(`.nav-btn[data-view="${id}"]`)
+          .classList.add("active");
+        render();
+      }
+      function showModal(id) {
+        document.getElementById(id).classList.add("show");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("show");
+      }
+      function showToast(msg) {
+        const c = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = "toast";
+        t.innerHTML = `<div class="toast-icon">✓</div><span>${msg}</span>`;
+        c.appendChild(t);
+        setTimeout(() => t.classList.add("show"), 10);
+        setTimeout(() => {
+          t.classList.remove("show");
+          setTimeout(() => t.remove(), 300);
+        }, 3000);
+      }
+      function confetti() {
+        const colors = ["#4a8eff", "#34d399", "#fbbf24", "#f87171", "#a78bfa"];
+        for (let i = 0; i < 30; i++) {
+          const c = document.createElement("div");
+          c.className = "confetti";
+          c.style.left = Math.random() * 100 + "vw";
+          c.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          c.style.animation = `fall ${2 + Math.random() * 2}s linear forwards`;
+          c.style.animationDelay = Math.random() * 0.5 + "s";
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 4500);
+        }
+      }
+      function playSound(type) {
+        if (!S.set.sound) return;
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          const t = ctx.currentTime;
+          if (type === "click") {
+            osc.frequency.setValueAtTime(800, t);
+            osc.type = "sine";
+            gain.gain.setValueAtTime(0.1, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+            osc.start(t);
+            osc.stop(t + 0.1);
+          } else if (type === "complete") {
+            osc.frequency.setValueAtTime(500, t);
+            osc.frequency.linearRampToValueAtTime(1000, t + 0.1);
+            osc.type = "triangle";
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+            osc.start(t);
+            osc.stop(t + 0.2);
+          } else if (type === "levelup") {
+            osc.frequency.setValueAtTime(400, t);
+            osc.frequency.linearRampToValueAtTime(1200, t + 0.4);
+            osc.type = "square";
+            gain.gain.setValueAtTime(0.1, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+            osc.start(t);
+            osc.stop(t + 0.4);
+          }
+        } catch (e) {}
+      }
+
+      // Initialize
+      document
+        .querySelectorAll(".nav-btn")
+        .forEach((b) =>
+          b.addEventListener("click", (e) => switchView(e.target.dataset.view)),
+        );
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document
+            .querySelectorAll(".modal.show")
+            .forEach((m) => m.classList.remove("show"));
+      });
+      load();
+      render();
+      refreshQuote();
+      setInterval(() => {
+        const n = new Date(),
+          e = new Date();
+        e.setHours(23, 59, 59, 999);
+        const d = e - n;
+        document.getElementById("cycleTimer").textContent =
+          `${String(Math.floor(d / 36e5)).padStart(2, "0")}:${String(Math.floor((d % 36e5) / 6e4)).padStart(2, "0")}:${String(Math.floor((d % 6e4) / 1e3)).padStart(2, "0")}`;
+      }, 1000);
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script>
+      // 🔑 Firebase sozlamalari (o'zingiznikiga almashtiring!)
+      const firebaseConfig = {
+        apiKey: "AIzaSyD-XXXXXXXXXXXXXXXXXXXXXXXX",
+        authDomain: "your-project.firebaseapp.com",
+        projectId: "your-project",
+        storageBucket: "your-project.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abcdef123456",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      // 🔄 Cloudga saqlash funksiyasi
+      async function saveToCloud(data) {
+        const user = auth.currentUser;
+        if (!user) return; // Login qilmagan bo'lsa saqlamaydi
+
+        await db.collection("users").doc(user.uid).set(
+          {
+            data: data,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        console.log("☁️ Saved to cloud");
+      }
+
+      // 📥 Cloud'dan yuklash
+      async function loadFromCloud() {
+        const user = auth.currentUser;
+        if (!user) return null;
+
+        const doc = await db.collection("users").doc(user.uid).get();
+        return doc.exists ? doc.data().data : null;
+      }
+
+      // 🔐 Login/Logout funksiyalari
+      function signInGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth
+          .signInWithPopup(provider)
+          .then(async (result) => {
+            const cloudData = await loadFromCloud();
+            if (cloudData) {
+              S = { ...S, ...cloudData }; // Cloud'dagi ma'lumotni qo'shish
+              render();
+              showToast("☁️ Cloud from loaded");
+            }
+            save(); // Mahalliy saqlash
+          })
+          .catch((err) => showToast("❌ Login error: " + err.message));
+      }
+
+      function signOut() {
+        auth.signOut().then(() => {
+          showToast("👋 Signed out");
+          // Istasangiz mahalliy ma'lumotlarni tozalashingiz mumkin
+        });
+      }
+
+      // 💾 save() funksiyasini yangilash (asliy save() dan keyin qo'shing)
+      const originalSave = save;
+      save = function () {
+        originalSave(); // Mahalliy saqlash
+        if (auth.currentUser) {
+          // Cloudga har 30 soniyada bir marta saqlash (debounce)
+          clearTimeout(window._saveTimeout);
+          window._saveTimeout = setTimeout(() => saveToCloud(S), 30000);
+        }
+      };
+    </script>
+
+    <!-- Dashboard card'laridan keyin qo'shing -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Weekly Progress</div>
+        <button class="btn btn-secondary text-xs" onclick="renderChart()">
+          🔄 Refresh
+        </button>
+      </div>
+      <canvas id="progressChart" height="120"></canvas>
+    </div>
+
+    <!-- index.html </body> dan oldin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+      let progressChart = null;
+
+      function renderChart() {
+        const ctx = document.getElementById('progressChart');
+        if (!ctx) return;
+
+        // So'nggi 7 kunlik XP ma'lumotlarini simulyatsiya qilamiz
+        // (Haqiqiy loyihada history dan olish kerak)
+        const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        const data = labels.map((_, i) => {
+          // Simulyatsiya: bugungi kunga yaqin kunlar ko'proq XP
+          const dayOffset = i - 6;
+          return Math.max(0, 50 + Math.random() * 30 - dayOffset * 5);
+        });
+
+        // Agar eski chart bo'lsa, yo'qotamiz
+        if (progressChart) progressChart.destroy();
+
+        // Yangi chart yaratamiz
+        progressChart = new Chart(ctx, {
+          type: 'line',
+           {
+            labels: labels,
+            datasets: [{
+              label: 'XP Earned',
+               data,
+              borderColor: getComputedStyle(document.body).getPropertyValue('--accent').trim(),
+              backgroundColor: getComputedStyle(document.body).getPropertyValue('--accent-soft').trim(),
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: '#fff',
+              pointBorderColor: getComputedStyle(document.body).getPropertyValue('--accent').trim(),
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'var(--text-muted)', font: { size: 10 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: 'var(--text-muted)', font: { size: 10 } }
+              }
+            }
+          }
+        });
+      }
+
+      // Dashboard render'ida chart'ni yangilash
+      const originalRender = render;
+      render = function() {
+        originalRender();
+        // Faqat dashboard ko'rinib turganda chart'ni chizamiz
+        if (document.getElementById('dashboard').classList.contains('active')) {
+          setTimeout(renderChart, 100); // DOM tayyor bo'lishini kutamiz
+        }
+      }
+    </script>
+  </body>
+</html>
